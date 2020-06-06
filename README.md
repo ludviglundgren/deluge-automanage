@@ -29,7 +29,7 @@ Flags:
 
 Create a new configuration file `.deluge-automanage.toml` in `$HOME/.config/deluge-automanage/`.
 
-    mkdir -p ~/.config/deluge-automanage && touch .deluge-automanage.toml
+    mkdir -p ~/.config/deluge-automanage && touch ~/.config/deluge-automanage/.deluge-automanage.toml
 
 A bare minimum config.
 
