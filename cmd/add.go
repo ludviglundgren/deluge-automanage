@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 
 	delugeclient "github.com/gdm85/go-libdeluge"
 	"github.com/spf13/cobra"
@@ -26,11 +25,6 @@ var addCmd = &cobra.Command{
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires a torrent file as first argument")
-		}
-
-		// check if file ens with .torrent
-		if path.Ext(args[0]) != ".torrent" {
-			return errors.New("requires a torrent file with .torrent extension")
 		}
 
 		return nil
