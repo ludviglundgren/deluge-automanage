@@ -1,0 +1,5 @@
+.idea
+.vagrant
+.DS_Store
+.deluge-automanage.toml
+bin/

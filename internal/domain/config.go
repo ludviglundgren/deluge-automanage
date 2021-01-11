@@ -5,6 +5,7 @@ type DelugeConfig struct {
 	Port     uint   `mapstructure:"port"`
 	Login    string `mapstructure:"login"`
 	Password string `mapstructure:"password"`
+	Version  string `mapstructure:"version"`
 }
 
 type Rules struct {
