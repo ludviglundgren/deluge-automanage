@@ -36,12 +36,24 @@ var addCmd = &cobra.Command{
 		// first arg is path to torrent file
 		filePath := args[0]
 
-		deluge := delugeclient.NewV1(delugeclient.Settings{
-			Hostname: Config.Deluge.Host,
-			Port:     Config.Deluge.Port,
-			Login:    Config.Deluge.Login,
-			Password: Config.Deluge.Password,
-		})
+		var deluge delugeclient.DelugeClient
+
+		if Config.Deluge.Version == "v2" {
+			deluge = delugeclient.NewV2(delugeclient.Settings{
+				Hostname: Config.Deluge.Host,
+				Port:     Config.Deluge.Port,
+				Login:    Config.Deluge.Login,
+				Password: Config.Deluge.Password,
+			})
+
+		} else {
+			deluge = delugeclient.NewV1(delugeclient.Settings{
+				Hostname: Config.Deluge.Host,
+				Port:     Config.Deluge.Port,
+				Login:    Config.Deluge.Login,
+				Password: Config.Deluge.Password,
+			})
+		}
 
 		// perform connection to Deluge server
 		err := deluge.Connect()

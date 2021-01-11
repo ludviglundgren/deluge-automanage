@@ -36,6 +36,7 @@ host     = "localhost"  # deluge daemon hostname/ip
 port     = 30000        # deluge daemon port
 login    = "my-user"    # deluge daemon user
 password = "my-pass"    # deluge daemon password
+version  = "v2"         # deluge version (v1 or v2)
  
 [rules]
 enabled              = true   # enable or disable rules
