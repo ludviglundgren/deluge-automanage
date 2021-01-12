@@ -7,51 +7,52 @@ import (
 	"io/ioutil"
 	"os"
 
-	delugeclient "github.com/gdm85/go-libdeluge"
+	"github.com/ludviglundgren/deluge-automanage/internal/config"
+
+	delugeClient "github.com/gdm85/go-libdeluge"
 	"github.com/spf13/cobra"
 )
 
-var Paused bool
+func RunAdd() *cobra.Command {
+	var paused bool
 
-func init() {
-	addCmd.Flags().BoolVarP(&Paused, "paused", "", false, "Add torrent in paused state")
-	rootCmd.AddCommand(addCmd)
-}
+	var command = &cobra.Command{
+		Use:   "add",
+		Short: "Add torrent",
+		Long:  `Add new torrent to Deluge`,
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("requires a torrent file as first argument")
+			}
 
-var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add torrent",
-	Long:  `Add new torrent to Deluge`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.New("requires a torrent file as first argument")
-		}
+			return nil
+		},
+	}
+	command.Flags().BoolVarP(&paused, "paused", "", false, "Add torrent in paused state")
 
-		return nil
-	},
-	Run: func(cmd *cobra.Command, args []string) {
+	command.Run = func(cmd *cobra.Command, args []string) {
 		fmt.Println("Add new torrent")
 
 		// args
 		// first arg is path to torrent file
 		filePath := args[0]
 
-		var deluge delugeclient.DelugeClient
+		var deluge delugeClient.DelugeClient
 
-		if Config.Deluge.Version == "v2" {
-			deluge = delugeclient.NewV2(delugeclient.Settings{
-				Hostname: Config.Deluge.Host,
-				Port:     Config.Deluge.Port,
-				Login:    Config.Deluge.Login,
-				Password: Config.Deluge.Password,
+		if config.Deluge.Version == "v2" {
+			deluge = delugeClient.NewV2(delugeClient.Settings{
+				Hostname: config.Deluge.Host,
+				Port:     config.Deluge.Port,
+				Login:    config.Deluge.Login,
+				Password: config.Deluge.Password,
 			})
 
 		} else {
-			deluge = delugeclient.NewV1(delugeclient.Settings{
-				Hostname: Config.Deluge.Host,
-				Port:     Config.Deluge.Port,
-				Login:    Config.Deluge.Login,
-				Password: Config.Deluge.Password,
+			deluge = delugeClient.NewV1(delugeClient.Settings{
+				Hostname: config.Deluge.Host,
+				Port:     config.Deluge.Port,
+				Login:    config.Deluge.Login,
+				Password: config.Deluge.Password,
 			})
 		}
 
@@ -69,13 +70,13 @@ var addCmd = &cobra.Command{
 		}
 
 		// check against rules
-		activeDownloads, err := deluge.TorrentsStatus(delugeclient.StateDownloading, nil)
+		activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: could not list all torrents: %v\n", err)
 			os.Exit(1)
 		}
 
-		if len(activeDownloads) >= Config.Rules.MaxActiveDownloads {
+		if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
 			fmt.Print("too many active downloads")
 			os.Exit(1)
 		}
@@ -83,8 +84,8 @@ var addCmd = &cobra.Command{
 		// encode file to base64 before sending to deluge
 		encodedFile := base64.StdEncoding.EncodeToString(torrentFile)
 
-		options := delugeclient.Options{
-			AddPaused: &Paused,
+		options := delugeClient.Options{
+			AddPaused: &paused,
 			// Add download save path
 		}
 
@@ -94,5 +95,7 @@ var addCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Torrent successfully added! Torrenthash: %v\n", torrentHash)
-	},
+	}
+
+	return command
 }
