@@ -78,3 +78,4 @@ Add a new torrent to deluge.
 
 Flags:
   * `--paused` - add torrent in paused state
+  * `--label` - add a label to torrent
