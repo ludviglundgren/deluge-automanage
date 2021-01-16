@@ -80,13 +80,15 @@ func v1Add(filePath string, paused bool, label string) error {
 	}
 
 	// check against rules
-	activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
-	if err != nil {
-		log.Fatalf("could not list all torrents: %v", err)
-	}
+	if config.Rules.Enabled {
+		activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
+		if err != nil {
+			log.Fatalf("could not list all torrents: %v", err)
+		}
 
-	if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
-		log.Fatalf("too many active downloads: %v", err)
+		if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
+			log.Fatalf("too many active downloads: %v", err)
+		}
 	}
 
 	// encode file to base64 before sending to deluge
@@ -147,13 +149,15 @@ func v2Add(filePath string, paused bool, label string) error {
 	}
 
 	// check against rules
-	activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
-	if err != nil {
-		log.Fatalf("could not list all torrents: %v", err)
-	}
+	if config.Rules.Enabled {
+		activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
+		if err != nil {
+			log.Fatalf("could not list all torrents: %v", err)
+		}
 
-	if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
-		log.Fatalf("too many active downloads: %v", err)
+		if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
+			log.Fatalf("too many active downloads: %v", err)
+		}
 	}
 
 	// encode file to base64 before sending to deluge
