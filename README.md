@@ -4,13 +4,11 @@ A cli to automate Deluge. Currently very minimal.
 
 ## Install
 
-Download binary and put somewhere in $PATH.
-
-    wget https://github.com/ludviglundgren/deluge-automanage/releases/download/v0.1.1/deluge-automanage_0.1.1_linux_amd64.tar.gz
+Download the [latest binary](https://github.com/ludviglundgren/deluge-automanage/releases) and put somewhere in $PATH.
 
 Extract binary
 
-    tar -xzvf deluge-automanage_0.1.1_linux_amd64.tar.gz
+    tar -xzvf deluge-automanage_$VERSION_linux_amd64.tar.gz
 
 Move to somewhere in `$PATH`. Need sudo if not already root. Or put it in your user `$HOME/bin` or similar.
 
@@ -43,6 +41,8 @@ enabled              = true   # enable or disable rules
 max_active_downloads = 1      # set max active downloads
 ```
 
+⚠️ NOTICE: Be sure to set the correct Deluge version!
+
 * If running on HDDs and 1Gbit - `max_active_downloads = 2` is a good setting to not overload the disks and gives as much bandwidth as possible to the torrents. 
 * For SSDs and 1Gbit+ you can increase this value.
 
@@ -60,6 +60,14 @@ If you want to grab as many new torrents as possible you can change your filters
 
 If there are some filters that you want to be 100% sure gets downloaded, then either use the old deluge-console/watch action for those, or do the inverse and use the global action as deluge-console and specific filters with deluge-automanage.
 
+Or edit via `autodl.cfg` instead:
+
+```
+[filter example_filter_action]
+upload-command = /usr/bin/deluge-automanage
+upload-args = add "$(TorrentPathName)"
+```
+
 ## Usage
 
 Use `deluge-automange help` to find out more about how to use.
@@ -72,10 +80,10 @@ Flags:
 
 ### Add
 
+Flags:
+* `--paused` - add torrent in paused state
+* `--label` - add a label to torrent
+
 Add a new torrent to deluge.
 
     deluge-automanage add my-torrent-file.torrent
-
-Flags:
-  * `--paused` - add torrent in paused state
-  * `--label` - add a label to torrent
