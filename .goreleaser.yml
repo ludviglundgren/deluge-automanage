@@ -1,0 +1,21 @@
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - main: ./cmd/deluge-automanage/main.go
+    binary: deluge-automanage
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - 386
+      - amd64
+
+archives:
+  - files:
+      - .deluge-automanage.toml.example
