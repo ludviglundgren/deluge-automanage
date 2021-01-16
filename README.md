@@ -83,6 +83,7 @@ Flags:
 Flags:
 * `--paused` - add torrent in paused state
 * `--label` - add a label to torrent
+* `--save-path` - save torrent to path
 
 Add a new torrent to deluge.
 
