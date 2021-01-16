@@ -16,6 +16,7 @@ func RunAdd() *cobra.Command {
 	var (
 		paused bool
 		label  string
+		path  string
 	)
 
 	var command = &cobra.Command{
@@ -34,6 +35,7 @@ func RunAdd() *cobra.Command {
 	}
 	command.Flags().BoolVarP(&paused, "paused", "", false, "Add torrent in paused state")
 	command.Flags().StringVar(&label, "label", "", "Add label to torrent")
+	command.Flags().StringVar(&path, "save-path", "", "Save torrent to path")
 
 	command.Run = func(cmd *cobra.Command, args []string) {
 
@@ -43,12 +45,12 @@ func RunAdd() *cobra.Command {
 
 		switch config.Deluge.Version {
 		case "v1":
-			err := v1Add(filePath, paused, label)
+			err := v1Add(filePath, paused, label, path)
 			if err != nil {
 				log.Fatalf("could not add torrent: %v", err)
 			}
 		case "v2":
-			err := v2Add(filePath, paused, label)
+			err := v2Add(filePath, paused, label, path)
 			if err != nil {
 				log.Fatalf("could not add torrent: %v", err)
 			}
@@ -58,7 +60,7 @@ func RunAdd() *cobra.Command {
 	return command
 }
 
-func v1Add(filePath string, paused bool, label string) error {
+func v1Add(filePath string, paused bool, label string, path string) error {
 
 	var deluge = delugeClient.NewV1(delugeClient.Settings{
 		Hostname: config.Deluge.Host,
@@ -99,7 +101,7 @@ func v1Add(filePath string, paused bool, label string) error {
 
 	options := delugeClient.Options{
 		AddPaused: &paused,
-		// Add download save path
+		DownloadLocation: &path,
 	}
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
@@ -127,7 +129,7 @@ func v1Add(filePath string, paused bool, label string) error {
 	return nil
 }
 
-func v2Add(filePath string, paused bool, label string) error {
+func v2Add(filePath string, paused bool, label string, path string) error {
 
 	var deluge = delugeClient.NewV2(delugeClient.Settings{
 		Hostname: config.Deluge.Host,
@@ -168,7 +170,7 @@ func v2Add(filePath string, paused bool, label string) error {
 
 	options := delugeClient.Options{
 		AddPaused: &paused,
-		// Add download save path
+		DownloadLocation: &path,
 	}
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
