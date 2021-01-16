@@ -3,10 +3,8 @@ package cmd
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 
 	"github.com/ludviglundgren/deluge-automanage/internal/config"
 
@@ -38,7 +36,6 @@ func RunAdd() *cobra.Command {
 	command.Flags().StringVar(&label, "label", "", "Add label to torrent")
 
 	command.Run = func(cmd *cobra.Command, args []string) {
-		fmt.Println("Add new torrent")
 
 		// args
 		// first arg is path to torrent file
@@ -73,30 +70,30 @@ func v1Add(filePath string, paused bool, label string) error {
 	// perform connection to Deluge server
 	err := deluge.Connect()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: connection failed: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("connection failed: %v", err)
 	}
 	defer deluge.Close()
 
 	torrentFile, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("could not read torrent file: %v", err)
 	}
 
 	// check against rules
 	activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: could not list all torrents: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("could not list all torrents: %v", err)
 	}
 
 	if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
-		fmt.Print("too many active downloads")
-		os.Exit(1)
+		log.Fatalf("too many active downloads: %v", err)
 	}
 
 	// encode file to base64 before sending to deluge
 	encodedFile := base64.StdEncoding.EncodeToString(torrentFile)
+	if encodedFile == "" {
+		log.Fatalf("could not encode file: %v", err)
+	}
 
 	options := delugeClient.Options{
 		AddPaused: &paused,
@@ -105,7 +102,7 @@ func v1Add(filePath string, paused bool, label string) error {
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("could add torrent: %v", err)
 	}
 
 	if label != "" {
@@ -124,7 +121,7 @@ func v1Add(filePath string, paused bool, label string) error {
 
 	}
 
-	fmt.Printf("Torrent successfully added! Torrenthash: %v\n", torrentHash)
+	log.Printf("Torrent successfully added! Hash: %v\n", torrentHash)
 	return nil
 }
 
@@ -140,30 +137,30 @@ func v2Add(filePath string, paused bool, label string) error {
 	// perform connection to Deluge server
 	err := deluge.Connect()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: connection failed: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("connection failed: %v", err)
 	}
 	defer deluge.Close()
 
 	torrentFile, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("could not read torrent file: %v", err)
 	}
 
 	// check against rules
 	activeDownloads, err := deluge.TorrentsStatus(delugeClient.StateDownloading, nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: could not list all torrents: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("could not list all torrents: %v", err)
 	}
 
 	if len(activeDownloads) >= config.Rules.MaxActiveDownloads {
-		fmt.Print("too many active downloads")
-		os.Exit(1)
+		log.Fatalf("too many active downloads: %v", err)
 	}
 
 	// encode file to base64 before sending to deluge
 	encodedFile := base64.StdEncoding.EncodeToString(torrentFile)
+	if encodedFile == "" {
+		log.Fatalf("could not encode file: %v", err)
+	}
 
 	options := delugeClient.Options{
 		AddPaused: &paused,
@@ -172,7 +169,7 @@ func v2Add(filePath string, paused bool, label string) error {
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("could add torrent: %v", err)
 	}
 
 	if label != "" {
@@ -191,6 +188,6 @@ func v2Add(filePath string, paused bool, label string) error {
 
 	}
 
-	fmt.Printf("Torrent successfully added! Torrenthash: %v\n", torrentHash)
+	log.Printf("Torrent successfully added! Hash: %v\n", torrentHash)
 	return nil
 }
