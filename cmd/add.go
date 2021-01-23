@@ -99,9 +99,15 @@ func v1Add(filePath string, paused bool, label string, path string) error {
 		log.Fatalf("could not encode file: %v", err)
 	}
 
-	options := delugeClient.Options{
-		AddPaused: &paused,
-		DownloadLocation: &path,
+	// set options
+	options := delugeClient.Options{}
+
+	if paused {
+		options.AddPaused = &paused
+	}
+
+	if path != "" {
+		options.DownloadLocation = &path
 	}
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
@@ -168,9 +174,15 @@ func v2Add(filePath string, paused bool, label string, path string) error {
 		log.Fatalf("could not encode file: %v", err)
 	}
 
-	options := delugeClient.Options{
-		AddPaused: &paused,
-		DownloadLocation: &path,
+	// set options
+	options := delugeClient.Options{}
+
+	if paused {
+		options.AddPaused = &paused
+	}
+
+	if path != "" {
+		options.DownloadLocation = &path
 	}
 
 	torrentHash, err := deluge.AddTorrentFile(filePath, encodedFile, &options)
